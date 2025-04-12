@@ -1,0 +1,10 @@
+3. Line Plot - Top 10 Values of First Numeric Column
+plt.figure(figsize=(10, 4))
+top10 = df[numeric_cols[0]].sort_values(ascending=False).head(10).reset_index(drop=True)
+plt.plot(top10, marker='o', linestyle='-', color='crimson', linewidth=2)
+plt.title(f"📈 Top 10 Values of {numeric_cols[0]}")
+plt.xlabel("Index")
+plt.ylabel(numeric_cols[0])
+plt.grid(True)
+plt.tight_layout()
+plt.show()
