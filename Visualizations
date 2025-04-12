@@ -1,0 +1,12 @@
+ 5️⃣ Visualizations (Focused and Clear)
+# --------------------------------------------------
+
+# 📦 1. Boxplots for Selected Numeric Columns (Only 2)
+plt.figure(figsize=(10, 5))
+for i, col in enumerate(selected_outlier_cols):
+    plt.subplot(1, 2, i + 1)
+    sns.boxplot(y=df[col], color='skyblue')
+    plt.title(f"📦 Outliers in '{col}'")
+    plt.tight_layout()
+plt.show()
+
