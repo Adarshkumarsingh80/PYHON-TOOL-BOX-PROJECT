@@ -1,0 +1,18 @@
+# 3️⃣ Outlier Removal using IQR (for only 2 columns)
+# --------------------------------------------------
+def remove_outliers_iqr(data, columns):
+    cleaned_df = data.copy()
+    for col in columns:
+        Q1 = cleaned_df[col].quantile(0.25)
+        Q3 = cleaned_df[col].quantile(0.75)
+        IQR = Q3 - Q1
+        lower = Q1 - 1.5 * IQR
+        upper = Q3 + 1.5 * IQR
+        cleaned_df = cleaned_df[(cleaned_df[col] >= lower) & (cleaned_df[col] <= upper)]
+    return cleaned_df
+
+# Remove outliers from first 2 numeric columns only
+selected_outlier_cols = numeric_cols[:2]
+print(f"\n📦 Before Outlier Removal: {df.shape}")
+df = remove_outliers_iqr(df, selected_outlier_cols)
+print(f"✅ After Outlier Removal: {df.shape}")
