@@ -1,0 +1,11 @@
+ 2. Histograms with KDE for Selected Columns
+plt.figure(figsize=(12, 5))
+for i, col in enumerate(selected_outlier_cols):
+    plt.subplot(1, 2, i + 1)
+    sns.histplot(df[col], bins=30, kde=True, color='steelblue')
+    plt.title(f"📊 Distribution of {col}")
+    plt.xlabel(col)
+    plt.ylabel("Frequency")
+plt.tight_layout()
+plt.show()
+
