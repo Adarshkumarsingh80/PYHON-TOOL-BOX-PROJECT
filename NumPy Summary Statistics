@@ -1,0 +1,6 @@
+4️⃣ NumPy Summary Statistics
+# --------------------------------------------------
+print("\n📊 NumPy Summary Stats:")
+for col in numeric_cols:
+    print(f"{col}: mean={np.mean(df[col]):.2f}, std={np.std(df[col]):.2f}")
+
