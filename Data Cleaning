@@ -1,0 +1,128 @@
+# 📦 Import Libraries
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# 🧪 Set Seaborn & Matplotlib styles
+sns.set_theme(style="whitegrid", font_scale=1.2)
+plt.rcParams["figure.dpi"] = 120  # Sharper resolution for figures
+
+# --------------------------------------------------
+# 1️⃣ Load Dataset (handle encoding issues)
+# --------------------------------------------------
+df = pd.read_csv(r"C:\Users\rahul\Downloads\MA2020_HARYANA.csv", encoding_errors='ignore')
+
+# Preview dataset
+print("📄 First 5 Rows:\n", df.head())
+print("\n🔍 Dataset Info:\n")
+print(df.info())
+
+# --------------------------------------------------
+# 2️⃣ Data Cleaning
+# --------------------------------------------------
+# Identify numeric and categorical columns
+numeric_cols = df.select_dtypes(include=[np.number]).columns.tolist()
+categorical_cols = df.select_dtypes(include='object').columns.tolist()
+
+# Fill missing numeric values with median
+df[numeric_cols] = df[numeric_cols].fillna(df[numeric_cols].median())
+
+# Drop duplicate rows
+df.drop_duplicates(inplace=True)
+
+# --------------------------------------------------
+# 3️⃣ Outlier Removal using IQR (for only 2 columns)
+# --------------------------------------------------
+def remove_outliers_iqr(data, columns):
+    cleaned_df = data.copy()
+    for col in columns:
+        Q1 = cleaned_df[col].quantile(0.25)
+        Q3 = cleaned_df[col].quantile(0.75)
+        IQR = Q3 - Q1
+        lower = Q1 - 1.5 * IQR
+        upper = Q3 + 1.5 * IQR
+        cleaned_df = cleaned_df[(cleaned_df[col] >= lower) & (cleaned_df[col] <= upper)]
+    return cleaned_df
+
+# Remove outliers from first 2 numeric columns only
+selected_outlier_cols = numeric_cols[:2]
+print(f"\n📦 Before Outlier Removal: {df.shape}")
+df = remove_outliers_iqr(df, selected_outlier_cols)
+print(f"✅ After Outlier Removal: {df.shape}")
+
+# --------------------------------------------------
+# 4️⃣ NumPy Summary Statistics
+# --------------------------------------------------
+print("\n📊 NumPy Summary Stats:")
+for col in numeric_cols:
+    print(f"{col}: mean={np.mean(df[col]):.2f}, std={np.std(df[col]):.2f}")
+
+# --------------------------------------------------
+# 5️⃣ Visualizations (Focused and Clear)
+# --------------------------------------------------
+
+# 📦 1. Boxplots for Selected Numeric Columns (Only 2)
+plt.figure(figsize=(10, 5))
+for i, col in enumerate(selected_outlier_cols):
+    plt.subplot(1, 2, i + 1)
+    sns.boxplot(y=df[col], color='skyblue')
+    plt.title(f"📦 Outliers in '{col}'")
+    plt.tight_layout()
+plt.show()
+
+# 📊 2. Histograms with KDE for Selected Columns
+plt.figure(figsize=(12, 5))
+for i, col in enumerate(selected_outlier_cols):
+    plt.subplot(1, 2, i + 1)
+    sns.histplot(df[col], bins=30, kde=True, color='steelblue')
+    plt.title(f"📊 Distribution of {col}")
+    plt.xlabel(col)
+    plt.ylabel("Frequency")
+plt.tight_layout()
+plt.show()
+
+# 📈 3. Line Plot - Top 10 Values of First Numeric Column
+plt.figure(figsize=(10, 4))
+top10 = df[numeric_cols[0]].sort_values(ascending=False).head(10).reset_index(drop=True)
+plt.plot(top10, marker='o', linestyle='-', color='crimson', linewidth=2)
+plt.title(f"📈 Top 10 Values of {numeric_cols[0]}")
+plt.xlabel("Index")
+plt.ylabel(numeric_cols[0])
+plt.grid(True)
+plt.tight_layout()
+plt.show()
+
+# 🌡️ 4. Correlation Heatmap
+corr = df[numeric_cols].corr()
+mask = np.triu(np.ones_like(corr, dtype=bool))
+
+plt.figure(figsize=(10, 7))
+sns.heatmap(
+    corr,
+    annot=True,
+    mask=mask,
+    cmap='coolwarm',
+    fmt=".2f",
+    linewidths=.5,
+    square=True,
+    cbar_kws={"shrink": .8}
+)
+plt.title("📌 Correlation Heatmap", fontsize=16)
+plt.tight_layout()
+plt.show()
+
+# 📋 5. Barplot for First Categorical Column
+if categorical_cols:
+    cat_col = categorical_cols[0]
+    plt.figure(figsize=(10, 6))
+    sns.countplot(
+        data=df,
+        y=cat_col,
+        order=df[cat_col].value_counts().index[:10],
+        palette='Blues_r'
+    )
+    plt.title(f"📋 Top Categories in '{cat_col}'", fontsize=16)
+    plt.xlabel("Count")
+    plt.tight_layout()
+    plt.show()
